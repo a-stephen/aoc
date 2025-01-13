@@ -36,29 +36,35 @@ fn is_safe(report: &Vec<i32>) -> bool {
 }
 
 fn is_safe_dampened_2(report: &Vec<i32>) -> bool {
+    let mut split_report: Vec<Vec<i32>> = vec![];
     let report_clone: Vec<i32> = report.into_iter().cloned().collect();
     for (idx, _level) in report_clone.clone().into_iter().enumerate() {
-        if idx != 0 || idx != report_clone.len() {
-            let arr_right: &[i32] = &report_clone[0..idx];
-            let arr_left: &[i32] = &report_clone[idx+1..];
-            // is_safe(&arr_right)
-            println!("{:?} {:?} {:?} {:?}", idx, arr_right, arr_left, report_clone);
-        }
+        let arr_right: &[i32] = &report_clone[0..idx];
+        let arr_left: &[i32] = &report_clone[idx+1..];
+        let report_one_level_out = [arr_right, arr_left].concat();
+        split_report.push(
+            report_one_level_out.into_iter().collect::<Vec<i32>>()
+        );
     }
-    
-    true
+    let dampened_report: usize = split_report.iter().filter(
+        |s_report| is_safe(&s_report)
+    ).count();
+
+    let safe_one_level_out: bool = dampened_report >= 1;
+
+    safe_one_level_out
 }
 
 
 fn compute_report_safety(reports: &Vec<Vec<i32>>) {
-//    let part_a: usize = reports.iter().filter(|report| is_safe(&report)).count();
-    let part_b: usize = reports.iter().filter(|&report| is_safe_dampened_2(report)).count();
-//    println!("Part A: {:?}", part_a);
+    let part_a: usize = reports.iter().filter(|report| is_safe(&report)).count();
+    let part_b: usize = reports.iter().filter(|report| is_safe_dampened_2(&report)).count();
+    println!("Part A: {:?}", part_a);
     println!("Part B: {:?}", part_b);
 }
 
 fn main() {
-    let file_path = "./data/t_input.txt";
+    let file_path = "./data/r_input.txt";
     let input = fs::read_to_string(file_path).unwrap();
     let reports = get_reports(&input);
 
